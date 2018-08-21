@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three bmfont sdf text test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			html { overflow: hidden; }
+			body {
+				font-family: Monospace;
+				background-color: #333333;
+				margin: 0px;
+				overflow: hidden;
+			}
+			.dg.ac { z-index: 1000 !important; }
+		</style>
+	</head>
+	<body>
+
+		<script src="https://cdn.rawgit.com/mrdoob/three.js/r95/build/three.js"></script>
+		<script src="https://cdn.rawgit.com/mrdoob/three.js/r95/examples/js/controls/OrbitControls.js"></script>
+		<script src="https://cdn.rawgit.com/mrdoob/three.js/r95/examples/js/vr/WebVR.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.2/dat.gui.min.js"></script>
+
+		<script src="https://cdn.rawgit.com/davidlyons/THREE.VRController/master/VRController.js"></script>
+		<script src="third-party/has.js"></script>
+		<script src="third-party/interaction.js"></script>
+
+		<script src="three-bmfont-text-bundle.js"></script>
+		<script src="sdf-shader.js"></script>
+		<script src="text-bitmap.js"></script>
+
+		<script>
+
+			// https://developers.google.com/web/showcase/2017/within
+
+			//
+
+			// http://browserify.org/
+			// browserify three-bmfont-text.js -o three-bmfont-text-bundle.js
+
+			// https://www.npmjs.com/package/three-bmfont-text
+
+			//
+
+			var bmtext;
+
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x333333 );
+
+			var renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, .01, 100000 );
+			camera.position.set( 0.13, 1, -0.26 );
+			scene.add( camera );
+
+			var orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
+
+			document.body.appendChild( WEBVR.createButton( renderer ) );
+
+			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
+				camera.position.set( 0.13, 1, -0.26 );
+				camera.quaternion.set(0,0,0,0);
+				var isPresenting = event.display.isPresenting;
+				renderer.vr.enabled = isPresenting;
+				orbitControls.enabled = !isPresenting;
+			});
+
+			//
+
+			var gridHelper = new THREE.GridHelper( 5, 10, 0xDDDDDD );
+			scene.add( gridHelper );
+
+			var mouse = new THREE.Vector2();
+			mouse.moved = false;
+
+			var interaction = new Interaction( renderer, camera );
+			interaction.connect();
+
+			var fileLoader = new THREE.FileLoader();
+			var textureLoader = new THREE.TextureLoader();
+			textureLoader.crossOrigin = 'anonymous';
+
+			var fileName = './fonts/roboto/bitmap/roboto-bold';
+
+			var fontTexture = textureLoader.load( fileName + '.png', function(){
+				fontTexture.needsUpdate = true;
+				fontTexture.minFilter = THREE.LinearMipMapLinearFilter;
+				fontTexture.magFilter = THREE.LinearFilter;
+				fontTexture.generateMipmaps = true;
+				fontTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+			});
+
+			fileLoader.load( fileName + '.json', function( font ){
+
+				font = JSON.parse( font );
+
+				var txt = 'Grumpy wizards make toxic brew for the evil Queen and Jack.';
+
+				bmtext = new TextBitmap({
+					font: font,
+					texture: fontTexture,
+					text: txt,
+					width: 1000,
+					align: 'center',
+					valign: 'center',
+					lineHeight: font.common.lineHeight - 20,
+					letterSpacing: 1,
+					scale: 0.0004,
+					rotate: false,
+					color: "#ccc",
+					outlineColor: "#000",
+					showHitBox: true // for debugging
+				});
+
+				bmtext.material.uniforms.smoothing.value = 0.2; // for bryant
+
+				// wireframe on three-bitmap-text geometry is incorrect
+				// var wireframe = new THREE.WireframeGeometry( bmtext.mesh.geometry );
+				// var line = new THREE.LineSegments( wireframe );
+				// line.material.color.setHex(0x000000);
+				// bmtext.mesh.add( line );
+
+				bmtext.position.set( 0, 1, -0.5 );
+				orbitControls.target.copy( bmtext.position );
+
+				scene.add( bmtext );
+				interaction.listen( bmtext.hitBox );
+
+				var defaultColor = new THREE.Color( bmtext.config.color );
+				var overColor = defaultColor.clone().offsetHSL(0,0,0.2); // lighter
+				var downColor = defaultColor.clone().offsetHSL(0,0,-0.2); // darker
+
+				bmtext.hitBox.addEventListener('over', function(){
+					this.mesh.material.uniforms.color.value = overColor;
+				});
+
+				bmtext.hitBox.addEventListener('out', function(){
+					this.mesh.material.uniforms.color.value = defaultColor;
+				});
+
+				bmtext.hitBox.addEventListener('primary-down', function(){
+					this.mesh.material.uniforms.color.value = downColor;
+					orbitControls.enabled = false;
+				});
+
+				bmtext.hitBox.addEventListener('primary-up', function(){
+					this.mesh.material.uniforms.color.value = overColor;
+					orbitControls.enabled = true;
+				});
+
+				interaction.addEventListener('primary-up', function(){
+					orbitControls.enabled = true;
+				});
+
+				bmtext.add( new THREE.AxesHelper(20) );
+
+				var gui = new dat.GUI();
+				gui.add( bmtext, 'text' );
+				gui.add( bmtext.config, 'align', ['left', 'center', 'right'] ).onChange(function(){ bmtext.geometry.update( bmtext.config ); });
+				gui.add( bmtext.config, 'valign', ['center', 'top', 'bottom'] ).onChange(function(){ bmtext.update(); });
+				gui.add( bmtext.config, 'width', 200, 1500 ).onChange(function(){ bmtext.update(); });
+				gui.add( bmtext.config, 'letterSpacing', -10, 100 ).step(1).onChange(function(){ bmtext.update(); });
+				gui.add( bmtext.config, 'lineHeight', 0, 500 ).step(1).onChange(function(){ bmtext.update(); });
+				gui.add( bmtext.config, 'scale', 0.0001, 0.0009 ).onChange(function(s){ bmtext.scale.set(s,s,s); });
+				gui.add( bmtext.material.uniforms.smoothing, 'value', 0, 0.4 ).name('smoothing');
+				gui.add( bmtext.material.uniforms.threshold, 'value', 0, 2 ).name('threshold');
+				gui.add( bmtext.material.uniforms.outlineDistance, 'value', 0, 1 ).name('outline distance'); // 0 to 0.5 ?
+				gui.add( bmtext.material.uniforms.opacity, 'value', 0, 1 ).name('opacity');
+				gui.add( bmtext.config, 'rotate' ).onChange(function(val){ if ( !val ) bmtext.rotation.set(0,0,0); });
+				gui.add( bmtext.config, 'showHitBox' ).onChange(function(val) { bmtext.hitBox.material.opacity = val ? 1 : 0; });
+				gui.addColor( bmtext.config, 'color' ).onChange(function(val){
+					bmtext.material.uniforms.color.value.setStyle(val);
+					defaultColor.setStyle(val);
+					overColor.setStyle(val).offsetHSL(0,0,0.2); // lighter
+					downColor.setStyle(val).offsetHSL(0,0,-0.2); // darker
+				});
+				gui.addColor( bmtext.config, 'outlineColor' ).onChange(function(val){ bmtext.material.uniforms.outlineColor.value.setStyle(val); });
+
+				var timeout;
+
+				var config = {
+					background: '#' + scene.background.getHexString(),
+					typeSpeed: 50,
+					typewriter: function() {
+						var i = 0;
+						bmtext.text = ' ';
+						if ( timeout ) {
+							clearTimeout(timeout);
+							timeout = null;
+						}
+
+						function type() {
+							if (i < txt.length) {
+								bmtext.text += txt.charAt(i);
+								i++;
+								timeout = setTimeout(type, config.typeSpeed);
+							}
+						}
+						type();
+					}
+				};
+
+				gui.addColor( config, 'background' ).onChange(function(val){ scene.background.setStyle(val); });
+
+				gui.add(config, 'typewriter');
+				gui.add(config, 'typeSpeed', 10, 100);
+
+				document.body.appendChild( renderer.domElement );
+				renderer.setAnimationLoop( loop );
+
+			});
+
+			window.addEventListener('resize', resize, false);
+			function resize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function loop() {
+
+				THREE.VRController.update();
+				interaction.update();
+
+				if ( !renderer.vr.isPresenting() && orbitControls.enabled ) {
+					orbitControls.update();
+				}
+
+				if ( bmtext.config.rotate ) {
+					bmtext.rotation.x += 0.01;
+					bmtext.rotation.y += 0.01;
+				}
+
+				renderer.render( scene, camera );
+			}
+
+		</script>
+
+	</body>
+</html>

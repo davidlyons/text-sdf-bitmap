@@ -1,0 +1,15 @@
+{
+  "name": "load-bmfont-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "load-bmfont": "^1.2.3",
+    "three-bmfont-text": "^2.1.0"
+  }
+}
