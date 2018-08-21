@@ -2,6 +2,8 @@
 
 Three.js Bitmap Font / Signed Distance Field Text / One Quad Per Character
 
+[View Example](http://davidscottlyons.com/text-sdf-bitmap/)
+
 ## Wrapper and instructions for mattdesl's npm module
 
 [https://www.npmjs.com/package/three-bmfont-text](https://www.npmjs.com/package/three-bmfont-text)
@@ -35,7 +37,9 @@ node load-bmfont.js
 
 http://browserify.org/
 
+```
 browserify three-bmfont-text.js -o three-bmfont-text-bundle.js
+```
 
 ### 3. Include bundle, shader, and wrapper
 
