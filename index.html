@@ -11,6 +11,8 @@
 				background-color: #333333;
 				margin: 0px;
 				overflow: hidden;
+				transition: opacity 300ms;
+				opacity: 0;
 			}
 			.dg.ac { z-index: 1000 !important; }
 		</style>
@@ -67,6 +69,22 @@
 				renderer.vr.enabled = isPresenting;
 				orbitControls.enabled = !isPresenting;
 			});
+
+			// THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+				// console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+			// };
+
+			THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+				// console.log( 'Loading Complete!');
+
+				document.body.appendChild( renderer.domElement );
+
+				document.body.style.opacity = 1;
+
+				renderer.setAnimationLoop( loop );
+
+			};
 
 			//
 
@@ -207,9 +225,6 @@
 
 				gui.add(config, 'typewriter');
 				gui.add(config, 'typeSpeed', 10, 100);
-
-				document.body.appendChild( renderer.domElement );
-				renderer.setAnimationLoop( loop );
 
 			});
 
