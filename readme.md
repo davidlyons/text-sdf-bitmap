@@ -55,10 +55,10 @@ browserify three-bmfont-text.js -o three-bmfont-text-bundle.js
 var robotoBoldKey = 'roboto-bold';
 var fileName = './fonts/roboto/bitmap/' + robotoBoldKey;
 var jsonPath = fileName + '.json';
-var texturePath = fileName + '.png';
+var imagePath = fileName + '.png';
 
 // load the Roboto bitmap font assets and assign them to the key
-TextBitmap.load( robotoBoldKey, jsonPath, texturePath );
+TextBitmap.load( robotoBoldKey, jsonPath, imagePath );
 
 // after the assets load, you can pass the font key to TextBitmap constructor
 THREE.DefaultLoadingManager.onLoad = function ( ) {
