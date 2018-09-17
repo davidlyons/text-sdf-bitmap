@@ -57,11 +57,13 @@ var fileName = './fonts/roboto/bitmap/' + robotoBoldKey;
 var jsonPath = fileName + '.json';
 var texturePath = fileName + '.png';
 
-// after the assets load, you can pass the font key to TextBitmap constructor
+// load the Roboto bitmap font assets and assign them to the key
 TextBitmap.load( robotoBoldKey, jsonPath, texturePath );
 
+// after the assets load, you can pass the font key to TextBitmap constructor
 THREE.DefaultLoadingManager.onLoad = function ( ) {
 
+  // fontKey and text are required, the rest are optional
   var bmtext = new TextBitmap({
     text: 'Grumpy wizards make toxic brew for the evil Queen and Jack.',
     fontKey: robotoBoldKey,
@@ -78,7 +80,6 @@ THREE.DefaultLoadingManager.onLoad = function ( ) {
   // TextBitmap inherits THREE.Group
   // so you can add instances to the scene
   // and position, scale or rotate them
-
   scene.add( bmtext );
   bmtext.position.set( 0, 1, -0.5 );
 
