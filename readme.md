@@ -52,22 +52,40 @@ browserify three-bmfont-text.js -o three-bmfont-text-bundle.js
 ### 4. Usage
 
 ```
-var bmtext = new TextBitmap({
-  text: 'Grumpy wizards make toxic brew for the evil Queen and Jack.',
-  font: font,
-  texture: texture,
-  width: 1000,
-  align: 'center',
-  valign: 'center',
-  lineHeight: font.common.lineHeight - 20,
-  letterSpacing: 1,
-  scale: 0.0004,
-  color: '#fff',
-  outlineColor: '#000'
-});
+var robotoBoldKey = 'roboto-bold';
+var fileName = './fonts/roboto/bitmap/' + robotoBoldKey;
+var jsonPath = fileName + '.json';
+var texturePath = fileName + '.png';
 
-bmtext.position.set( 0, 1, -0.5 );
-scene.add( bmtext );
+// after the assets load, you can pass the font key to TextBitmap constructor
+TextBitmap.load( robotoBoldKey, jsonPath, texturePath );
+
+THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+  var bmtext = new TextBitmap({
+    text: 'Grumpy wizards make toxic brew for the evil Queen and Jack.',
+    fontKey: robotoBoldKey,
+    width: 1000,
+    align: 'center',
+    valign: 'center',
+    lineHeight: 80,
+    letterSpacing: 1,
+    scale: 0.0004,
+    color: '#fff',
+    outlineColor: '#000'
+  });
+
+  // TextBitmap inherits THREE.Group
+  // so you can add instances to the scene
+  // and position, scale or rotate them
+
+  scene.add( bmtext );
+  bmtext.position.set( 0, 1, -0.5 );
+
+  // you can also change the text by setting the text property
+  bmtext.text = 'The quick brown fox jumps over the lazy dog.';
+
+};
 ```
 
 To update text:

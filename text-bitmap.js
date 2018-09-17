@@ -10,7 +10,18 @@ var TextBitmap = function( config ) {
 	config.color = config.color || '#fff';
 	config.outlineColor = config.outlineColor || '#000';
 
-	var geometry = this.geometry = createGeometry( config ); // text-bm-font
+	config.font = TextBitmap.fonts[ config.fontKey ].json;
+	config.texture = TextBitmap.fonts[ config.fontKey ].texture;
+
+	config.width = config.width || undefined; // Leave as undefined to remove word-wrapping
+	config.align = config.align || 'left';
+	config.valign = config.valign || 'center';
+	config.lineHeight = config.lineHeight || config.font.common.lineHeight;
+	config.letterSpacing = config.letterSpacing || 0;
+
+	// https://github.com/Jam3/three-bmfont-text
+	// defined in // three-bmfont-text-bundle.js
+	var geometry = this.geometry = createGeometry( config );
 
 	var material = this.material = new THREE.ShaderMaterial({
 		uniforms: THREE.UniformsUtils.clone( SDFShader.uniforms ),
@@ -43,8 +54,8 @@ var TextBitmap = function( config ) {
 
 	this.update();
 
-	var scale = config.scale || 1;
-	this.scale.setScalar( scale );
+	config.scale = config.scale || 0.0004;
+	this.scale.setScalar( config.scale );
 
 	this.add( mesh );
 	this.add( hitBox );
@@ -105,3 +116,34 @@ Object.defineProperty(TextBitmap.prototype, 'text', {
 	}
 
 });
+
+// array of objects of all the bitmap fonts loaded through TextBitmap.load
+// access font assets (json and texture) with the same fontKey after loading
+// this way you can reuse fonts without reloading their two assets
+// and you can set fonts with a single property, rather than two
+TextBitmap.fonts = [];
+
+TextBitmap.fileLoader = new THREE.FileLoader();
+TextBitmap.textureLoader = new THREE.TextureLoader();
+TextBitmap.textureLoader.crossOrigin = 'anonymous';
+
+TextBitmap.load = function( fontKey, jsonPath, imagePath ){
+
+	TextBitmap.fonts[ fontKey ] = TextBitmap.fonts[ fontKey ] || {};
+
+	TextBitmap.fileLoader.load( jsonPath, function( response ){
+		var json = JSON.parse( response );
+		TextBitmap.fonts[ fontKey ].json = json;
+	});
+
+	var texture = TextBitmap.textureLoader.load( imagePath, function(){
+		texture.needsUpdate = true;
+		texture.minFilter = THREE.LinearMipMapLinearFilter;
+		texture.magFilter = THREE.LinearFilter;
+		texture.generateMipmaps = true;
+		texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+	});
+
+	TextBitmap.fonts[ fontKey ].texture = texture;
+
+};
