@@ -21,7 +21,7 @@
 
 		<script src="https://cdn.rawgit.com/mrdoob/three.js/r96/build/three.js"></script>
 		<script src="https://cdn.rawgit.com/mrdoob/three.js/r96/examples/js/controls/OrbitControls.js"></script>
-		<script src="https://cdn.rawgit.com/mrdoob/three.js/r96/examples/js/vr/WebVR.js"></script>
+		<!-- <script src="https://cdn.rawgit.com/mrdoob/three.js/r96/examples/js/vr/WebVR.js"></script> -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.2/dat.gui.min.js"></script>
 
 		<script src="https://cdn.rawgit.com/davidlyons/THREE.VRController/master/VRController.js"></script>
@@ -60,7 +60,7 @@
 
 			var orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer ) );
+			// document.body.appendChild( WEBVR.createButton( renderer ) );
 
 			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
 				camera.position.set( 0.13, 1, -0.26 );
