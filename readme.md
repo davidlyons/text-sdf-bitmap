@@ -2,13 +2,13 @@
 
 Three.js Bitmap Font / Signed Distance Field Text / One Quad Per Character
 
-[View Example](http://davidscottlyons.com/text-sdf-bitmap/)
+[View Example](https://davidlyons.dev/text-sdf-bitmap)
 
-## Wrapper and instructions for mattdesl's npm module
+## Wrapper and instructions
 
-[https://www.npmjs.com/package/three-bmfont-text](https://www.npmjs.com/package/three-bmfont-text)
+[https://github.com/Experience-Monks/three-bmfont-text](https://github.com/Experience-Monks/three-bmfont-text)
 
-[https://developers.google.com/web/showcase/2017/within](https://developers.google.com/web/showcase/2017/within)
+[https://web.dev/case-studies/within](https://web.dev/case-studies/within)
 
 ### 1. Create the bitmap font (png + json)
 
