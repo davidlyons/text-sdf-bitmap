@@ -13,6 +13,7 @@ Three.js Bitmap Font / Signed Distance Field Text / One Quad Per Character
 ### 1. Create the bitmap font (png + json)
 
 #### Save .fnt/.png
+
 ```
 cd fonts/hiero
 java -jar runnable-hiero.jar
@@ -20,15 +21,20 @@ java -jar runnable-hiero.jar
 
 #### convert .fnt to .json
 install from package.json:
+
 ```
 cd ../../
 npm install
 ```
+
 or
+
 ```
 npm install load-bmfont --save-dev
 ```
+
 then
+
 ```
 node load-bmfont.js
 ```
@@ -43,7 +49,7 @@ browserify three-bmfont-text.js -o three-bmfont-text-bundle.js
 
 ### 3. Include bundle, shader, and wrapper
 
-```
+```html
 <script src="three-bmfont-text-bundle.js"></script>
 <script src="sdf-shader.js"></script>
 <script src="text-bitmap.js"></script>
@@ -51,7 +57,7 @@ browserify three-bmfont-text.js -o three-bmfont-text-bundle.js
 
 ### 4. Usage
 
-```
+```js
 var robotoBoldKey = 'roboto-bold';
 var fileName = './fonts/roboto/bitmap/' + robotoBoldKey;
 var jsonPath = fileName + '.json';
@@ -91,4 +97,6 @@ THREE.DefaultLoadingManager.onLoad = function ( ) {
 
 To update text:
 
-`bmtext.text = 'new string'`
+```js
+bmtext.text = 'new string'
+```
